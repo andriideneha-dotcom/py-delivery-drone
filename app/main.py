@@ -9,7 +9,7 @@ class BaseRobot:
             coords = [0, 0]
         self.name = name
         self.weight = weight
-        self.coords = coords[:2]
+        self.coords = coords
 
     def go_forward(self, step: int = 1) -> None:
         self.coords[1] += step
@@ -39,8 +39,7 @@ class FlyingRobot(BaseRobot):
         elif len(coords) == 2:
             coords = [coords[0], coords[1], 0]
 
-        super().__init__(name, weight, coords[:2])
-        self.coords.append(coords[2])
+        super().__init__(name, weight, coords)  # передаємо 3D coords напряму
 
     def go_up(self, step: int = 1) -> None:
         self.coords[2] += step
@@ -70,7 +69,11 @@ class DeliveryDrone(FlyingRobot):
             self.hook_load(current_load)
 
     def hook_load(self, cargo: Cargo) -> None:
-        if self.current_load is None and cargo.weight <= self.max_load_weight:
+        if (
+            self.current_load is None
+            and self.max_load_weight is not None  # guard від None
+            and cargo.weight <= self.max_load_weight
+        ):
             self.current_load = cargo
 
     def unhook_load(self) -> None:
